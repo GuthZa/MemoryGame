@@ -62,10 +62,11 @@ function startGame() {
   for (let item of document.querySelectorAll(".list-item"))
     item.classList.add("gameStarted");
 
-  showCards();
+  // showCards();
   shuffleArray(cardsLogos);
-  changePictures();
-  let newCardLogos = [];
+  //changePictures(cardsLogos);
+  let newCardLogos = makeDoubles();
+  changePictures(newCardLogos); 
 }
 
 function stopGame() {
@@ -97,13 +98,29 @@ const shuffleArray = (array) => {
   }
 };
 
-function changePictures() {
+//This function changes the src and data- in the html
+function changePictures(cardLogos) {
   let indice = 0;
-  for (const card of cards) {
+  for (let card of cards) {
     let cardFront = card.querySelector(".card-front");
-    cardFront.src = `images/${cardsLogos[indice]}.png`;
-    card.dataset.logo = cardsLogos[indice];
-
+    cardFront.src = `images/${cardLogos[indice]}.png`;
+    card.dataset.logo = cardLogos[indice];
     indice++;
+    card.addEventListener("click", flipCard);
   }
+}
+
+//This function will take x ammount of names
+//where x is 1/2 of the max cards for the game
+//doubles them in a new array
+//and shuffles
+function makeDoubles() {
+  let newCardLogos = cardsLogos.slice(0, 3);
+  newCardLogos = [...newCardLogos, ...newCardLogos];
+  shuffleArray(newCardLogos);
+  return newCardLogos;
+}
+
+function flipCard() {
+  this.classList.add("flipped");
 }
