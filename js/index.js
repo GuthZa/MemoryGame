@@ -7,6 +7,7 @@ const btPlay = document.querySelector("#btPlay");
 const message = document.querySelector("#message");
 const cards = document.querySelectorAll(".card");
 let flippedCards = [];
+let totalFlippedCards = 0;
 const cardsLogos = [
   "angular",
   "bootstrap",
@@ -70,11 +71,13 @@ function startGame() {
   changePictures(newCardLogos);
 
   flippedCards = [];
+  totalFlippedCards = 0;
 }
 
 function stopGame() {
   btPlay.textContent = "Iniciar Jogo";
   btLevel.disabled = false;
+  modalGameOver.showModal();
   reset();
   hideCards();
 }
@@ -111,14 +114,11 @@ function changePictures(cardLogos) {
     cardFront.src = `images/${cardLogos[indice]}.png`;
     card.dataset.logo = cardLogos[indice];
     indice++;
-    card.addEventListener("click", flipCard);
+    card.addEventListener("click", flipCard, { once: true });
   }
 }
 
-//This function will take x ammount of names
-//where x is 1/2 of the max cards for the game
-//doubles them in a new array
-//and shuffles
+//This will make sure theres always pairs for the cards
 function makeDoubles() {
   let newCardLogos = cardsLogos.slice(0, 3);
   newCardLogos = [...newCardLogos, ...newCardLogos];
@@ -135,7 +135,9 @@ function flipCard() {
 function checkPair(card) {
   let card2 = flippedCards[0];
   if (card.dataset.logo === card2.dataset.logo) {
-    removeCards(card, card2);
+    removeCard(card);
+    removeCard(card2);
+    totalFlippedCards += 2;
 
     console.log("iguais");
   } else {
@@ -144,17 +146,21 @@ function checkPair(card) {
     setTimeout(() => {
       card.classList.toggle("flipped");
       card2.classList.toggle("flipped");
+      card.addEventListener("click", flipCard, { once: true });
+      card2.addEventListener("click", flipCard, { once: true });
     }, 500);
   }
   flippedCards.pop();
 }
 
-function removeCards(card1, card2) {
+function removeCard(card) {
   setTimeout(() => {
-    card1.querySelector(".card-front").classList.add("grayscale");
-    card2.querySelector(".card-front").classList.add("grayscale");
-    card1.classList.add("inative");
-    card2.classList.add("inative");
+    card.querySelector(".card-front").classList.add("grayscale");
+    card.classList.add("inative");
   }, 400);
   //Serves to tell the user the cards are checked and correct
+}
+
+function gameOver() {
+  return totalFlippedCards === cards.length;
 }
