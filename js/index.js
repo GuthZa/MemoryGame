@@ -88,6 +88,8 @@ function showCards() {
 function hideCards() {
   for (let card of cards) {
     card.classList.remove("flipped");
+    card.classList.remove("inative");
+    card.querySelector(".card-front").classList.remove("grayscale");
   }
 }
 
@@ -143,17 +145,16 @@ function checkPair(card) {
       card.classList.toggle("flipped");
       card2.classList.toggle("flipped");
     }, 500);
-
-    // card.classList.toggle("flipped");
-    // flippedCards[0].classList.toggle("flipped");
   }
   flippedCards.pop();
 }
 
 function removeCards(card1, card2) {
+  setTimeout(() => {
+    card1.querySelector(".card-front").classList.add("grayscale");
+    card2.querySelector(".card-front").classList.add("grayscale");
+    card1.classList.add("inative");
+    card2.classList.add("inative");
+  }, 400);
   //Serves to tell the user the cards are checked and correct
-  card1.querySelector(".card-front").classList.add("grayscale");
-  card2.querySelector(".card-front").classList.add("grayscale");
-  card1.classList.add("inative");
-  card2.classList.add("inative");
 }
