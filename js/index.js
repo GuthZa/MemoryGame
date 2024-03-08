@@ -55,6 +55,7 @@ function reset() {
   for (let item of document.querySelectorAll(".list-item"))
     item.classList.remove("gameStarted");
   cards.forEach((card) => card.removeEventListener("click", flipCard));
+  hideCards();
 }
 
 function startGame() {
@@ -80,7 +81,6 @@ function stopGame() {
   btLevel.disabled = false;
   modalGameOver.showModal();
   reset();
-  hideCards();
 }
 
 function showCards() {
