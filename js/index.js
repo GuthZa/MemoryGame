@@ -6,6 +6,7 @@ const btLevel = document.querySelector("#btLevel");
 const btPlay = document.querySelector("#btPlay");
 const message = document.querySelector("#message");
 const cards = document.querySelectorAll(".card");
+let flippedCards = [];
 const cardsLogos = [
   "angular",
   "bootstrap",
@@ -66,7 +67,9 @@ function startGame() {
   shuffleArray(cardsLogos);
   //changePictures(cardsLogos);
   let newCardLogos = makeDoubles();
-  changePictures(newCardLogos); 
+  changePictures(newCardLogos);
+
+  flippedCards = [];
 }
 
 function stopGame() {
@@ -122,5 +125,23 @@ function makeDoubles() {
 }
 
 function flipCard() {
-  this.classList.add("flipped");
+  this.classList.toggle("flipped");
+  if (flippedCards.length === 0) {
+    flippedCards.push(this);
+  } else {
+    checkPair(this);
+    flippedCards.pop();
+  }
+}
+
+function checkPair(card) {
+  if (card.dataset.logo === flippedCards[0].dataset.logo) {
+    //in order to tell the user the cards are checked and correct
+    card.querySelector(".card-front").classList.add("grayscale");
+    flippedCards[0].querySelector(".card-front").classList.add("grayscale");
+
+    console.log("iguais");
+  } else {
+    console.log("não são iguais");
+  }
 }
