@@ -54,6 +54,7 @@ function reset() {
 
   for (let item of document.querySelectorAll(".list-item"))
     item.classList.remove("gameStarted");
+  cards.forEach((card) => card.removeEventListener("click", flipCard));
 }
 
 function startGame() {
@@ -128,8 +129,7 @@ function makeDoubles() {
 
 function flipCard() {
   this.classList.toggle("flipped");
-  if (flippedCards.length === 0) flippedCards.push(this);
-  else checkPair(this);
+  flippedCards.length === 0 ? flippedCards.push(this) : checkPair(this);
 }
 
 function checkPair(card) {
@@ -138,11 +138,7 @@ function checkPair(card) {
     removeCard(card);
     removeCard(card2);
     totalFlippedCards += 2;
-
-    console.log("iguais");
   } else {
-    console.log("não são iguais");
-
     setTimeout(() => {
       card.classList.toggle("flipped");
       card2.classList.toggle("flipped");
