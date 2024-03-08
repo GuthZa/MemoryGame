@@ -131,18 +131,29 @@ function flipCard() {
 }
 
 function checkPair(card) {
-  if (card.dataset.logo === flippedCards[0].dataset.logo) {
-    //in order to tell the user the cards are checked and correct
-    card.querySelector(".card-front").classList.add("grayscale");
-    flippedCards[0].querySelector(".card-front").classList.add("grayscale");
+  let card2 = flippedCards[0];
+  if (card.dataset.logo === card2.dataset.logo) {
+    removeCards(card, card2);
+
     console.log("iguais");
   } else {
     console.log("não são iguais");
 
     setTimeout(() => {
       card.classList.toggle("flipped");
-      flippedCards[0].classList.toggle("flipped");
+      card2.classList.toggle("flipped");
     }, 500);
+
+    // card.classList.toggle("flipped");
+    // flippedCards[0].classList.toggle("flipped");
   }
   flippedCards.pop();
+}
+
+function removeCards(card1, card2) {
+  //Serves to tell the user the cards are checked and correct
+  card1.querySelector(".card-front").classList.add("grayscale");
+  card2.querySelector(".card-front").classList.add("grayscale");
+  card1.classList.add("inative");
+  card2.classList.add("inative");
 }
