@@ -126,12 +126,8 @@ function makeDoubles() {
 
 function flipCard() {
   this.classList.toggle("flipped");
-  if (flippedCards.length === 0) {
-    flippedCards.push(this);
-  } else {
-    checkPair(this);
-    flippedCards.pop();
-  }
+  if (flippedCards.length === 0) flippedCards.push(this);
+  else checkPair(this);
 }
 
 function checkPair(card) {
@@ -139,9 +135,14 @@ function checkPair(card) {
     //in order to tell the user the cards are checked and correct
     card.querySelector(".card-front").classList.add("grayscale");
     flippedCards[0].querySelector(".card-front").classList.add("grayscale");
-
     console.log("iguais");
   } else {
     console.log("não são iguais");
+
+    setTimeout(() => {
+      card.classList.toggle("flipped");
+      flippedCards[0].classList.toggle("flipped");
+    }, 500);
   }
+  flippedCards.pop();
 }
