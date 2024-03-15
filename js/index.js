@@ -3,9 +3,13 @@
 const START_TIME_BASICO = 20; //seconds
 const START_TIME_INTERMEDIO = 60;
 const START_TIME_AVANCADO = 180;
+const PARES_BASICO = 3;
+const PARES_INTERMEDIO = 6;
+const PARES_AVANCADO = 10;
+const POINT_LOSS = 5;
 let timer;
 let timerId;
-let pontos = 0;
+let totalPoints = 0;
 
 const panelControl = document.querySelector("#panel-control");
 const panelGame = document.querySelector("#game");
@@ -14,7 +18,9 @@ const btPlay = document.querySelector("#btPlay");
 const message = document.querySelector("#message");
 const cards = document.querySelectorAll(".card");
 const labelGameTime = document.querySelector("#gameTime");
-const labelPontos = document.querySelector("#points");
+const labelPoints = document.querySelector("#points");
+const messageGameOver = document.querySelector("#messageGameOver");
+const nickname = document.querySelector("#nickname");
 
 let flippedCards = [];
 let totalFlippedCards = 0;
@@ -86,6 +92,8 @@ function startGame() {
   flippedCards = [];
   totalFlippedCards = 0;
 
+  totalPoints = 0;
+
   getTimer();
   labelGameTime.textContent = timer + "s";
   timerId = setInterval(updateGameTime, 1000);
@@ -96,9 +104,10 @@ function stopGame() {
   btLevel.disabled = false;
   modalGameOver.showModal();
 
-  clearInterval(timerId);
+  messageGameOver.textContent = totalPoints;
+  nickname.style.display = "none";
 
-  reset();
+  clearInterval(timerId);
 }
 
 function showCards() {
@@ -156,10 +165,8 @@ function checkPair(card) {
     removeCard(card);
     removeCard(card2);
     totalFlippedCards += 2;
-    //basico 3
-    //intermediario 6
-    //avancado 10
-    pontos = timer * (+btLevel.value * 3);
+
+    updatePoints();
   } else {
     setTimeout(() => {
       card.classList.toggle("flipped");
@@ -167,9 +174,10 @@ function checkPair(card) {
       card.addEventListener("click", flipCard, { once: true });
       card2.addEventListener("click", flipCard, { once: true });
     }, 500);
+
+    updatePoints(0);
   }
   flippedCards.pop();
-  labelPontos.textContent = pontos;
 }
 
 function removeCard(card) {
@@ -207,4 +215,22 @@ function getTimer() {
     default:
       timer = START_TIME_BASICO;
   }
+}
+
+function updatePoints(operation = "+") {
+  if (operation === "+") {
+    switch (btLevel.value) {
+      case "1":
+        totalPoints += timer * PARES_BASICO;
+        break;
+      case "2":
+        totalPoints += timer * PARES_INTERMEDIO;
+        break;
+      case "3":
+        totalPoints += timer * PARES_AVANCADO;
+        break;
+    }
+  } else totalPoints = Math.max(0, totalPoints - POINT_LOSS);
+
+  labelPoints.textContent = totalPoints;
 }
