@@ -1,11 +1,21 @@
 "use strict";
 
+const START_TIME_BASICO = 20; //seconds
+const START_TIME_INTERMEDIO = 60;
+const START_TIME_AVANCADO = 180;
+let timer;
+let timerId;
+let pontos = 0;
+
 const panelControl = document.querySelector("#panel-control");
 const panelGame = document.querySelector("#game");
 const btLevel = document.querySelector("#btLevel");
 const btPlay = document.querySelector("#btPlay");
 const message = document.querySelector("#message");
 const cards = document.querySelectorAll(".card");
+const labelGameTime = document.querySelector("#gameTime");
+const labelPontos = document.querySelector("#points");
+
 let flippedCards = [];
 let totalFlippedCards = 0;
 const cardsLogos = [
@@ -52,6 +62,8 @@ function reset() {
     panelGame.style.display = "grid";
   }
 
+  labelGameTime.removeAttribute("style");
+
   for (let item of document.querySelectorAll(".list-item"))
     item.classList.remove("gameStarted");
   cards.forEach((card) => card.removeEventListener("click", flipCard));
@@ -66,20 +78,26 @@ function startGame() {
   for (let item of document.querySelectorAll(".list-item"))
     item.classList.add("gameStarted");
 
-  // showCards();
   shuffleArray(cardsLogos);
-  //changePictures(cardsLogos);
+
   let newCardLogos = makeDoubles();
   changePictures(newCardLogos);
 
   flippedCards = [];
   totalFlippedCards = 0;
+
+  getTimer();
+  labelGameTime.textContent = timer + "s";
+  timerId = setInterval(updateGameTime, 1000);
 }
 
 function stopGame() {
   btPlay.textContent = "Iniciar Jogo";
   btLevel.disabled = false;
   modalGameOver.showModal();
+
+  clearInterval(timerId);
+
   reset();
 }
 
@@ -138,6 +156,10 @@ function checkPair(card) {
     removeCard(card);
     removeCard(card2);
     totalFlippedCards += 2;
+    //basico 3
+    //intermediario 6
+    //avancado 10
+    pontos = timer * (+btLevel.value * 3);
   } else {
     setTimeout(() => {
       card.classList.toggle("flipped");
@@ -147,6 +169,7 @@ function checkPair(card) {
     }, 500);
   }
   flippedCards.pop();
+  labelPontos.textContent = pontos;
 }
 
 function removeCard(card) {
@@ -159,4 +182,29 @@ function removeCard(card) {
 
 function gameOver() {
   return totalFlippedCards === cards.length;
+}
+
+function updateGameTime() {
+  timer--;
+  labelGameTime.textContent = timer + "s";
+  console.log(timer);
+  if (timer <= 10) labelGameTime.style.backgroundColor = "red";
+
+  if (timer === 0) stopGame();
+}
+
+function getTimer() {
+  switch (btLevel.value) {
+    case "1":
+      timer = START_TIME_BASICO;
+      break;
+    case "2":
+      timer = START_TIME_INTERMEDIO;
+      break;
+    case "3":
+      timer = START_TIME_AVANCADO;
+      break;
+    default:
+      timer = START_TIME_BASICO;
+  }
 }
