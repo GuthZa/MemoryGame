@@ -10,17 +10,23 @@ const POINT_LOSS = 5;
 let timer;
 let timerId;
 let totalPoints = 0;
+let topGamers = [
+  { nickname: "Ze", points: 331 },
+  { nickname: "Maria", points: 321 },
+];
 
 const panelControl = document.querySelector("#panel-control");
 const panelGame = document.querySelector("#game");
 const btLevel = document.querySelector("#btLevel");
 const btPlay = document.querySelector("#btPlay");
 const message = document.querySelector("#message");
-const cards = document.querySelectorAll(".card");
+let cards = document.querySelectorAll(".card");
 const labelGameTime = document.querySelector("#gameTime");
 const labelPoints = document.querySelector("#points");
 const messageGameOver = document.querySelector("#messageGameOver");
 const nickname = document.querySelector("#nickname");
+const infoTop = document.querySelector("#infoTop");
+const pointsTop = document.querySelector("#pointsTop");
 
 let flippedCards = [];
 let totalFlippedCards = 0;
@@ -51,12 +57,17 @@ btLevel.addEventListener("change", reset);
 btPlay.addEventListener("click", () => {
   btPlay.textContent === "Terminar Jogo" ? stopGame() : startGame();
 });
+
 panelGame.addEventListener("click", () => {
   message.textContent =
     message.textContent === "" ? "Clique em Iniciar o Jogo" : "";
 });
 
+btTop.addEventListener("click", getTop10);
+
 function reset() {
+  createPanelGame();
+
   message.textContent = "";
   message.classList.remove("hide");
 
@@ -73,7 +84,7 @@ function reset() {
   for (let item of document.querySelectorAll(".list-item"))
     item.classList.remove("gameStarted");
   cards.forEach((card) => card.removeEventListener("click", flipCard));
-  hideCards();
+  //hideCards();
 }
 
 function startGame() {
@@ -97,6 +108,8 @@ function startGame() {
   getTimer();
   labelGameTime.textContent = timer + "s";
   timerId = setInterval(updateGameTime, 1000);
+
+  getTopPoints();
 }
 
 function stopGame() {
@@ -104,7 +117,7 @@ function stopGame() {
   btLevel.disabled = false;
   modalGameOver.showModal();
 
-  messageGameOver.textContent = totalPoints;
+  messageGameOver.textContent = "Pontuação: " + totalPoints;
   nickname.style.display = "none";
 
   clearInterval(timerId);
@@ -148,7 +161,7 @@ function changePictures(cardLogos) {
 
 //This will make sure theres always pairs for the cards
 function makeDoubles() {
-  let newCardLogos = cardsLogos.slice(0, 3);
+  let newCardLogos = cardsLogos.slice(0, cards.length / 2);
   newCardLogos = [...newCardLogos, ...newCardLogos];
   shuffleArray(newCardLogos);
   return newCardLogos;
@@ -204,6 +217,7 @@ function updateGameTime() {
 function getTimer() {
   switch (btLevel.value) {
     case "1":
+    default:
       timer = START_TIME_BASICO;
       break;
     case "2":
@@ -212,8 +226,6 @@ function getTimer() {
     case "3":
       timer = START_TIME_AVANCADO;
       break;
-    default:
-      timer = START_TIME_BASICO;
   }
 }
 
@@ -221,6 +233,7 @@ function updatePoints(operation = "+") {
   if (operation === "+") {
     switch (btLevel.value) {
       case "1":
+      default:
         totalPoints += timer * PARES_BASICO;
         break;
       case "2":
@@ -233,4 +246,76 @@ function updatePoints(operation = "+") {
   } else totalPoints = Math.max(0, totalPoints - POINT_LOSS);
 
   labelPoints.textContent = totalPoints;
+}
+
+function createPanelGame() {
+  panelGame.innerHTML = "";
+  panelGame.className = "";
+
+  let numCartas = 2;
+
+  switch (btLevel.value) {
+    case "0":
+      return;
+    case "2":
+      numCartas *= PARES_INTERMEDIO;
+      panelGame.setAttribute("class", "intermedio");
+      break;
+    case "3":
+      numCartas *= PARES_AVANCADO;
+      panelGame.setAttribute("class", "avancado");
+      break;
+    default:
+      numCartas *= PARES_BASICO;
+  }
+
+  //creates a card
+  let div = document.createElement("div");
+  div.setAttribute("class", "card");
+
+  let imgBack = document.createElement("img");
+  imgBack.setAttribute("class", "card-back");
+  imgBack.setAttribute("src", "images/ls.png");
+
+  let imgFront = document.createElement("img");
+  imgFront.setAttribute("class", "card-front");
+
+  div.appendChild(imgBack);
+  div.appendChild(imgFront);
+
+  for (let i = 0; i < numCartas; i++)
+    panelGame.appendChild(div.cloneNode(true));
+
+  cards = panelGame.childNodes;
+}
+
+function getTop10() {
+  let gamers = "";
+
+  topGamers.forEach((gamer) => {
+    gamers += `${gamer.nickname} - ${gamer.points} <br>`;
+  });
+
+  infoTop.textContent = "";
+  let div = document.createElement("div");
+  let paraNickName = document.createElement("p");
+  let paraPontos = document.createElement("p");
+  paraNickName.textContent = "Nick Name";
+  paraPontos.textContent = "Pontuação";
+
+  div.appendChild(paraNickName);
+  div.appendChild(paraPontos);
+
+  infoTop.appendChild(div);
+
+  topGamers.forEach((gamer) => {
+    let newDiv = div.cloneNode(true);
+    newDiv.firstChild.textContent = gamer.nickname;
+    newDiv.lastChild.textContent = gamer.points;
+    infoTop.appendChild(newDiv);
+  });
+}
+
+function getTopPoints() {
+  pointsTop.textContent = `Pontuação TOP: ${topGamers[0].points}`;
 }
