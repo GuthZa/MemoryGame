@@ -105,11 +105,11 @@ function startGame() {
 
   totalPoints = 0;
 
+  getTopPoints();
+
   getTimer();
   labelGameTime.textContent = timer + "s";
   timerId = setInterval(updateGameTime, 1000);
-
-  getTopPoints();
 }
 
 function stopGame() {
@@ -317,5 +317,5 @@ function getTop10() {
 }
 
 function getTopPoints() {
-  pointsTop.textContent = `Pontuação TOP: ${topGamers[0].points}`;
+  pointsTop.textContent = topGamers[0].points;
 }
