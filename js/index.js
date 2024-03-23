@@ -24,9 +24,10 @@ let cards = document.querySelectorAll(".card");
 const labelGameTime = document.querySelector("#gameTime");
 const labelPoints = document.querySelector("#points");
 const messageGameOver = document.querySelector("#messageGameOver");
-const nickname = document.querySelector("#nickname");
+const nick = document.querySelector("#nickname");
 const infoTop = document.querySelector("#infoTop");
 const pointsTop = document.querySelector("#pointsTop");
+const infoGame = document.querySelector("#messageGameOver");
 
 let flippedCards = [];
 let totalFlippedCards = 0;
@@ -65,6 +66,12 @@ panelGame.addEventListener("click", () => {
 
 btTop.addEventListener("click", getTop10);
 
+document.querySelector("#okTop").addEventListener("click", () => {
+  saveInTop10();
+  modalGameOver.close();
+  reset();
+});
+
 function reset() {
   createPanelGame();
 
@@ -84,7 +91,7 @@ function reset() {
   for (let item of document.querySelectorAll(".list-item"))
     item.classList.remove("gameStarted");
   cards.forEach((card) => card.removeEventListener("click", flipCard));
-  //hideCards();
+  hideCards();
 }
 
 function startGame() {
@@ -104,6 +111,7 @@ function startGame() {
   totalFlippedCards = 0;
 
   totalPoints = 0;
+  labelPoints.textContent = totalPoints;
 
   getTopPoints();
 
@@ -118,7 +126,9 @@ function stopGame() {
   modalGameOver.showModal();
 
   messageGameOver.textContent = "Pontuação: " + totalPoints;
-  nickname.style.display = "none";
+  nick.style.display = "none";
+
+  checkTop10();
 
   clearInterval(timerId);
 }
@@ -318,4 +328,52 @@ function getTop10() {
 
 function getTopPoints() {
   pointsTop.textContent = topGamers[0].points;
+}
+
+function getLastPoints() {
+  return topGamers[topGamers.length - 1].points;
+}
+
+function checkTop10() {
+  if (totalPoints > getLastPoints() || topGamers.length < 10) {
+    infoGame.innerHTML += "<br> Parabéns! Entrou no Top 10";
+    nick.style.display = "block";
+  } else {
+    nick.style.display = "none";
+  }
+}
+
+function saveInTop10() {
+  const nn = document.querySelector("#inputNick").value;
+  if (nn.trim() === "") return;
+  const gamer = { nickname: nn, points: totalPoints };
+
+  let isTopList = false;
+
+  topGamers = topGamers.map((element) => {
+    console.log(element.nickname);
+    if (element.nickname.toUpperCase() === gamer.nickname.toUpperCase()) {
+      isTopList = true;
+      if (element.points < gamer.points) return gamer;
+    }
+    return element;
+  });
+
+  if (!isTopList) topGamers.push(gamer);
+
+  topGamers.sort((a, b) => b.points - a.points);
+
+  if (topGamers.length > 10) topGamers.pop();
+
+  localStorage.setItem("gamerLS", JSON.stringify(gamer));
+  localStorage.setItem("top10LS", JSON.stringify(topGamers));
+}
+
+function getLocalStorage() {
+  const nickInput = document.querySelector("#inputNick");
+  const gamerLS = localStorage.getItem("gamerLS");
+  if (gamerLS !== null) nickInput.value = JSON.parse(gamerLS).nickname;
+
+  const topGamersLS = localStorage.getItem("top10LS");
+  if (topGamersLS !== null) topGamers = JSON.parse(topGamersLS);
 }
